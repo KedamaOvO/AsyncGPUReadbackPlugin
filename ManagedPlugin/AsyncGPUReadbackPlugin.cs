@@ -148,11 +148,13 @@ namespace AsyncGPUReadbackPluginNs {
 		[DllImport ("AsyncGPUReadbackPlugin")]
 		private static extern bool isCompatible();
 		[DllImport ("AsyncGPUReadbackPlugin")]
-		private static extern int makeRequest_mainThread(int texture, int miplevel);
+		private static extern int makeTextureRequest_mainThread(int texture, int miplevel);
+        [DllImport ("AsyncGPUReadbackPlugin")]
+        private static extern int makeSSBORequest_mainThread(int ssbo,int size,int offset);
 		[DllImport ("AsyncGPUReadbackPlugin")]
 		private static extern IntPtr getfunction_makeRequest_renderThread();
 		[DllImport ("AsyncGPUReadbackPlugin")]
-		private static extern void makeRequest_renderThread(int event_id);
+		private static extern void makeTextureRequest_renderThread(int event_id);
 		[DllImport ("AsyncGPUReadbackPlugin")]
 		private static extern IntPtr getfunction_update_renderThread();
 		[DllImport ("AsyncGPUReadbackPlugin")]

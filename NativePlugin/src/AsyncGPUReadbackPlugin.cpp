@@ -14,8 +14,8 @@
 
 #define DEBUG 1
 #ifdef DEBUG
-	#include <fstream>
-	#include <thread>
+    #include <fstream>
+    #include <thread>
 #endif
 
 
@@ -44,38 +44,38 @@
 
 struct SSBOTask{
     GLuint ssbo;
-	struct SubTask {
-		GLsync fence;
-		void* data;
-		bool initialized = false;
-		bool done = false;
-		bool error = false;
-		bool readed = false;
-	};
+    struct SubTask {
+        GLsync fence;
+        void* data;
+        bool initialized = false;
+        bool done = false;
+        bool error = false;
+        bool readed = false;
+    };
     int size;
     int offset;
-	std::queue<SubTask> subTaskQueue;
+    std::queue<SubTask> subTaskQueue;
 };
 
 struct Task {
-	GLuint texture;
-	int miplevel;
-	struct SubTask {
-		GLuint fbo;
-		GLuint pbo;
-		GLsync fence;
-		bool initialized = false;
-		bool error = false;
-		bool done = false;
-		bool readed = false;
-		void* data;
-		int size;
-		int height;
-		int width;
-		int depth;
-		GLint internal_format;
-	};
-	std::queue<SubTask> subTaskQueue;
+    GLuint texture;
+    int miplevel;
+    struct SubTask {
+        GLuint fbo;
+        GLuint pbo;
+        GLsync fence;
+        bool initialized = false;
+        bool error = false;
+        bool done = false;
+        bool readed = false;
+        void* data;
+        int size;
+        int height;
+        int width;
+        int depth;
+        GLint internal_format;
+    };
+    std::queue<SubTask> subTaskQueue;
 };
 
 static IUnityInterfaces* unityInterfaces = NULL;
@@ -97,7 +97,7 @@ bool tryGetValue(const std::map<int, T>& map, int key, T& outValue) {
         outValue = it->second;
         return true;
     }
-	outValue = nullptr;
+    outValue = nullptr;
     return false;
 }
 
@@ -109,8 +109,8 @@ _CPP_DebugLog __UnityDebugLog;
 
 void UnityLog(const char* message, int level)
 {
-	if(__UnityDebugLog)
-		__UnityDebugLog(message, level);
+    if(__UnityDebugLog)
+        __UnityDebugLog(message, level);
 }
 
 extern "C"
@@ -125,97 +125,97 @@ extern "C"
         __UnityDebugLog( "AddedDebugLog Callback", 1 );
     }
 
-	/**
-	 * Unity plugin load event
-	 */
-	void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
-	    UnityPluginLoad(IUnityInterfaces* interface)
-	{
+    /**
+     * Unity plugin load event
+     */
+    void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API
+        UnityPluginLoad(IUnityInterfaces* interface)
+    {
 
 
-		// #ifdef UNITY_ANDROID
-	    __android_log_print(ANDROID_LOG_DEBUG,"AppLog","1 UnityPluginLoad()  %d",glGetError());
-		// #endif
-	
+        // #ifdef UNITY_ANDROID
+        __android_log_print(ANDROID_LOG_DEBUG,"AppLog","1 UnityPluginLoad()  %d",glGetError());
+        // #endif
+    
 
-		#ifdef DEBUG
-			// logMain.open("/tmp/AsyncGPUReadbackPlugin_main.log", std::ios_base::app);
-			// logRender.open("/tmp/AsyncGPUReadbackPlugin_render.log", std::ios_base::app);
+        #ifdef DEBUG
+            // logMain.open("/tmp/AsyncGPUReadbackPlugin_main.log", std::ios_base::app);
+            // logRender.open("/tmp/AsyncGPUReadbackPlugin_render.log", std::ios_base::app);
 
-			glEnable              ( GL_DEBUG_OUTPUT );
+            glEnable              ( GL_DEBUG_OUTPUT );
 
-		#endif
+        #endif
 
-	    unityInterfaces = interface;
-	    graphics = unityInterfaces->Get<IUnityGraphics>();
-	        
-	    graphics->RegisterDeviceEventCallback(OnGraphicsDeviceEvent);
-	        
-	    // Run OnGraphicsDeviceEvent(initialize) manually on plugin load
-	    // to not miss the event in case the graphics device is already initialized
-	    OnGraphicsDeviceEvent(kUnityGfxDeviceEventInitialize);
-
-
-	    #ifdef UNITY_ANDROID
-	    __android_log_print(ANDROID_LOG_DEBUG,"AppLog","2 UnityPluginLoad()  %d",glGetError());
-		#endif
-	
-	}
-
-	/**
-	 * Unity unload plugin event
-	 */
-	void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
-	{
-		// UnityLog( "UnityPluginUnload::", 0 );
-		graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
-		// UnityLog( "UnityPluginUnload::", 1 );
-	}
-
-	/**
-	 * Called for every graphics device events
-	 */
-	static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
-	{
-		#ifdef UNITY_ANDROID
-	    __android_log_print(ANDROID_LOG_DEBUG,"AppLog","1 OnGraphicsDeviceEvent()  %d",glGetError());
-		#endif
-	
-		// Create graphics API implementation upon initialization
-		if (eventType == kUnityGfxDeviceEventInitialize)
-		{
-			renderer = graphics->GetRenderer();
-		}
-
-		// Cleanup graphics API implementation upon shutdown
-		if (eventType == kUnityGfxDeviceEventShutdown)
-		{
-			renderer = kUnityGfxRendererNull;
-		}
-
-		#ifdef UNITY_ANDROID
-	    __android_log_print(ANDROID_LOG_DEBUG,"AppLog","2 OnGraphicsDeviceEvent()  %d",glGetError());
-		#endif
-	}
+        unityInterfaces = interface;
+        graphics = unityInterfaces->Get<IUnityGraphics>();
+            
+        graphics->RegisterDeviceEventCallback(OnGraphicsDeviceEvent);
+            
+        // Run OnGraphicsDeviceEvent(initialize) manually on plugin load
+        // to not miss the event in case the graphics device is already initialized
+        OnGraphicsDeviceEvent(kUnityGfxDeviceEventInitialize);
 
 
-	/**
-	 * Check if plugin is compatible with this system
-	 * This plugin is only compatible with opengl core
-	 */
-	bool isCompatible() {
-		#ifdef UNITY_ANDROID
-	    __android_log_print(ANDROID_LOG_DEBUG,"AppLog","isCompatible::  %d", (int)renderer );
-		#endif
+        #ifdef UNITY_ANDROID
+        __android_log_print(ANDROID_LOG_DEBUG,"AppLog","2 UnityPluginLoad()  %d",glGetError());
+        #endif
+    
+    }
 
-		bool flag = (renderer == kUnityGfxRendererOpenGLES20 || renderer == kUnityGfxRendererOpenGLES30);
+    /**
+     * Unity unload plugin event
+     */
+    void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API UnityPluginUnload()
+    {
+        // UnityLog( "UnityPluginUnload::", 0 );
+        graphics->UnregisterDeviceEventCallback(OnGraphicsDeviceEvent);
+        // UnityLog( "UnityPluginUnload::", 1 );
+    }
 
-		return flag;
-	}
+    /**
+     * Called for every graphics device events
+     */
+    static void UNITY_INTERFACE_API OnGraphicsDeviceEvent(UnityGfxDeviceEventType eventType)
+    {
+        #ifdef UNITY_ANDROID
+        __android_log_print(ANDROID_LOG_DEBUG,"AppLog","1 OnGraphicsDeviceEvent()  %d",glGetError());
+        #endif
+    
+        // Create graphics API implementation upon initialization
+        if (eventType == kUnityGfxDeviceEventInitialize)
+        {
+            renderer = graphics->GetRenderer();
+        }
 
-	bool isSSBOCompatible() {
-		return renderer == kUnityGfxRendererOpenGLES30;
-	}
+        // Cleanup graphics API implementation upon shutdown
+        if (eventType == kUnityGfxDeviceEventShutdown)
+        {
+            renderer = kUnityGfxRendererNull;
+        }
+
+        #ifdef UNITY_ANDROID
+        __android_log_print(ANDROID_LOG_DEBUG,"AppLog","2 OnGraphicsDeviceEvent()  %d",glGetError());
+        #endif
+    }
+
+
+    /**
+     * Check if plugin is compatible with this system
+     * This plugin is only compatible with opengl core
+     */
+    bool isCompatible() {
+        #ifdef UNITY_ANDROID
+        __android_log_print(ANDROID_LOG_DEBUG,"AppLog","isCompatible::  %d", (int)renderer );
+        #endif
+
+        bool flag = (renderer == kUnityGfxRendererOpenGLES20 || renderer == kUnityGfxRendererOpenGLES30);
+
+        return flag;
+    }
+
+    bool isSSBOCompatible() {
+        return renderer == kUnityGfxRendererOpenGLES30;
+    }
 
     /**
      * @brief Init of the make request action.
@@ -232,8 +232,8 @@ extern "C"
         // Create the task
         std::shared_ptr<SSBOTask> task = std::make_shared<SSBOTask>();
         task->ssbo = ssbo;
-		task->size = size;
-		task->offset = offset;
+        task->size = size;
+        task->offset = offset;
 
         int event_id = next_event_id;
         next_event_id++;
@@ -246,7 +246,7 @@ extern "C"
         UnityLog( "makeSSBORequest_mainThread__:: END ", 1 );
 
         return event_id;
-	}
+    }
 
     /**
     @brief Create a a read ssbo request
@@ -261,308 +261,308 @@ extern "C"
         std::shared_ptr<SSBOTask> task = ssbo_tasks[event_id];
         tasks_mutex.unlock();
 
-		SSBOTask::SubTask subTask;
+        SSBOTask::SubTask subTask;
 
-		subTask.data = std::malloc(task->size);
+        subTask.data = std::malloc(task->size);
 
-		// Fence to know when it's ready
-		subTask.fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+        // Fence to know when it's ready
+        subTask.fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
         // Done init
         subTask.initialized = true;
-		subTask.done = false;
-		subTask.error = false;
+        subTask.done = false;
+        subTask.error = false;
 
         tasks_mutex.lock();
-		task->subTaskQueue.push(subTask);
-		tasks_mutex.unlock();
+        task->subTaskQueue.push(subTask);
+        tasks_mutex.unlock();
 
         UnityLog( "makeSSBORequest_renderThread__:: END ", 1 );
     }
 
-	/**
-	 * @brief Init of the make request action.
-	 * You then have to call makeRequest_renderThread
-	 * via GL.IssuePluginEvent with the returned event_id
-	 * 
-	 * @param texture OpenGL texture id
-	 * @return event_id to give to other functions and to IssuePluginEvent
-	 */
-	int makeTextureRequest_mainThread(GLuint texture, int miplevel) {
-		UnityLog( "makeTextureRequest_mainThread__:: START ", 0 );
+    /**
+     * @brief Init of the make request action.
+     * You then have to call makeRequest_renderThread
+     * via GL.IssuePluginEvent with the returned event_id
+     * 
+     * @param texture OpenGL texture id
+     * @return event_id to give to other functions and to IssuePluginEvent
+     */
+    int makeTextureRequest_mainThread(GLuint texture, int miplevel) {
+        UnityLog( "makeTextureRequest_mainThread__:: START ", 0 );
 
-		// Create the task
-		std::shared_ptr<Task> task = std::make_shared<Task>();
-		task->texture = texture;
-		task->miplevel = miplevel;
-		int event_id = next_event_id;
-		next_event_id++;
-
-
-		// Save it (lock because possible vector resize)
-		tasks_mutex.lock();
-		tasks[event_id] = task;
-		tasks_mutex.unlock();
-
-		UnityLog( "makeTextureRequest_mainThread__:: END ", 1 );
-
-		return event_id;
-	}
-
-	/**
-	 * @brief Create a a read texture request
-	 * Has to be called by GL.IssuePluginEvent
-	 * @param event_id containing the the task index, given by makeRequest_mainThread
-	 */
-	void UNITY_INTERFACE_API makeTextureRequest_renderThread(int event_id) {
+        // Create the task
+        std::shared_ptr<Task> task = std::make_shared<Task>();
+        task->texture = texture;
+        task->miplevel = miplevel;
+        int event_id = next_event_id;
+        next_event_id++;
 
 
-		UnityLog( "makeTextureRequest_renderThread_:: START ", 0 );
+        // Save it (lock because possible vector resize)
+        tasks_mutex.lock();
+        tasks[event_id] = task;
+        tasks_mutex.unlock();
+
+        UnityLog( "makeTextureRequest_mainThread__:: END ", 1 );
+
+        return event_id;
+    }
+
+    /**
+     * @brief Create a a read texture request
+     * Has to be called by GL.IssuePluginEvent
+     * @param event_id containing the the task index, given by makeRequest_mainThread
+     */
+    void UNITY_INTERFACE_API makeTextureRequest_renderThread(int event_id) {
 
 
-		// Get task back
-		tasks_mutex.lock();
-		std::shared_ptr<Task> task = tasks[event_id];
-		tasks_mutex.unlock();
-		Task::SubTask subTask;
-
-		// Get texture informations
-		glBindTexture(GL_TEXTURE_2D, task->texture);
-		glGetTexLevelParameteriv(GL_TEXTURE_2D, task->miplevel, GL_TEXTURE_INTERNAL_FORMAT, &(subTask.internal_format));
-		glGetTexLevelParameteriv(GL_TEXTURE_2D, task->miplevel, GL_TEXTURE_DEPTH, &(subTask.depth));
-		glGetTexLevelParameteriv(GL_TEXTURE_2D, task->miplevel, GL_TEXTURE_WIDTH, &(subTask.width));
-		glGetTexLevelParameteriv(GL_TEXTURE_2D, task->miplevel, GL_TEXTURE_HEIGHT, &(subTask.height));
-		subTask.size = subTask.depth * subTask.width * subTask.height * getPixelSizeFromInternalFormat(subTask.internal_format);
+        UnityLog( "makeTextureRequest_renderThread_:: START ", 0 );
 
 
-		// Check for errors
-		if (subTask.size == 0
-			|| getFormatFromInternalFormat(subTask.internal_format) == 0
-			|| getTypeFromInternalFormat(subTask.internal_format) == 0) {
-			subTask.error = true;
-			subTask.done = true;
-			GLenum error = glGetError();
-			char buffer[1000];
-			sprintf(buffer, "makeTextureRequest_renderThread__:: ERROR(%x) %d %d %d %d %d %d %d",error,task->texture, subTask.size, subTask.internal_format,
-			 subTask.width, subTask.height, subTask.depth, getPixelSizeFromInternalFormat(subTask.internal_format));
-			UnityLog( buffer, 1 );
-			return;
-		}
+        // Get task back
+        tasks_mutex.lock();
+        std::shared_ptr<Task> task = tasks[event_id];
+        tasks_mutex.unlock();
+        Task::SubTask subTask;
 
-		// Allocate the final data buffer !!! WARNING: free, will have to be done on script side !!!!
-		subTask.data = std::malloc(subTask.size);
-
-		// Create the fbo (frame buffer object) from the given texture
-		// subTask.fbo;
-		glGenFramebuffers(1, &(subTask.fbo));
-
-		// Bind the texture to the fbo
-		glBindFramebuffer(GL_FRAMEBUFFER, subTask.fbo);
+        // Get texture informations
+        glBindTexture(GL_TEXTURE_2D, task->texture);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, task->miplevel, GL_TEXTURE_INTERNAL_FORMAT, &(subTask.internal_format));
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, task->miplevel, GL_TEXTURE_DEPTH, &(subTask.depth));
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, task->miplevel, GL_TEXTURE_WIDTH, &(subTask.width));
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, task->miplevel, GL_TEXTURE_HEIGHT, &(subTask.height));
+        subTask.size = subTask.depth * subTask.width * subTask.height * getPixelSizeFromInternalFormat(subTask.internal_format);
 
 
-		// glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, subTask.texture, 0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, task->texture, 0);
-		// GL_TEXTURE_RECTANGLE, GL_TEXTURE_2D_MULTISAMPLE, or GL_TEXTURE_2D_MULTISAMPLE_ARRAY, then level must be zero.
+        // Check for errors
+        if (subTask.size == 0
+            || getFormatFromInternalFormat(subTask.internal_format) == 0
+            || getTypeFromInternalFormat(subTask.internal_format) == 0) {
+            subTask.error = true;
+            subTask.done = true;
+            GLenum error = glGetError();
+            char buffer[1000];
+            sprintf(buffer, "makeTextureRequest_renderThread__:: ERROR(%x) %d %d %d %d %d %d %d",error,task->texture, subTask.size, subTask.internal_format,
+             subTask.width, subTask.height, subTask.depth, getPixelSizeFromInternalFormat(subTask.internal_format));
+            UnityLog( buffer, 1 );
+            return;
+        }
 
-		// Create and bind pbo (pixel buffer object) to fbo
-		// subTask.pbo;
-		glGenBuffers(1, &(subTask.pbo));
-		glBindBuffer(GL_PIXEL_PACK_BUFFER, subTask.pbo);
-		glBufferData(GL_PIXEL_PACK_BUFFER, subTask.size, 0, GL_DYNAMIC_READ);
+        // Allocate the final data buffer !!! WARNING: free, will have to be done on script side !!!!
+        subTask.data = std::malloc(subTask.size);
 
-		// Start the read request
-		glReadBuffer(GL_COLOR_ATTACHMENT0);
-		glReadPixels(0, 0, subTask.width, subTask.height, getFormatFromInternalFormat(subTask.internal_format), getTypeFromInternalFormat(subTask.internal_format), 0);
+        // Create the fbo (frame buffer object) from the given texture
+        // subTask.fbo;
+        glGenFramebuffers(1, &(subTask.fbo));
 
-		// Unbind buffers
-		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // Bind the texture to the fbo
+        glBindFramebuffer(GL_FRAMEBUFFER, subTask.fbo);
 
-		// Fence to know when it's ready
-		subTask.fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-		
-		// Done init
-		subTask.initialized = true;
-		subTask.done = false;
-		subTask.error = false;
 
-		tasks_mutex.lock();
-		task->subTaskQueue.push(subTask);
-		tasks_mutex.unlock();
+        // glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, subTask.texture, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, task->texture, 0);
+        // GL_TEXTURE_RECTANGLE, GL_TEXTURE_2D_MULTISAMPLE, or GL_TEXTURE_2D_MULTISAMPLE_ARRAY, then level must be zero.
 
-		UnityLog( "makeTextureRequest_renderThread__:: END ", 1 );
-	}
+        // Create and bind pbo (pixel buffer object) to fbo
+        // subTask.pbo;
+        glGenBuffers(1, &(subTask.pbo));
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, subTask.pbo);
+        glBufferData(GL_PIXEL_PACK_BUFFER, subTask.size, 0, GL_DYNAMIC_READ);
 
-	UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API getfunction_makeTextureRequest_renderThread() {
-		return makeTextureRequest_renderThread;
-	}
+        // Start the read request
+        glReadBuffer(GL_COLOR_ATTACHMENT0);
+        glReadPixels(0, 0, subTask.width, subTask.height, getFormatFromInternalFormat(subTask.internal_format), getTypeFromInternalFormat(subTask.internal_format), 0);
+
+        // Unbind buffers
+        glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // Fence to know when it's ready
+        subTask.fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+        
+        // Done init
+        subTask.initialized = true;
+        subTask.done = false;
+        subTask.error = false;
+
+        tasks_mutex.lock();
+        task->subTaskQueue.push(subTask);
+        tasks_mutex.unlock();
+
+        UnityLog( "makeTextureRequest_renderThread__:: END ", 1 );
+    }
+
+    UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API getfunction_makeTextureRequest_renderThread() {
+        return makeTextureRequest_renderThread;
+    }
 
     UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API getfunction_makeSSBORequest_renderThread() {
-		return makeSSBORequest_renderThread;
-	}
+        return makeSSBORequest_renderThread;
+    }
 
-	/**
-	 * @brief check if data is ready
-	 * Has to be called by GL.IssuePluginEvent
-	 * @param event_id containing the the task index, given by makeRequest_mainThread
-	 */
-	void UNITY_INTERFACE_API update_renderThread(int event_id) {
-		UnityLog( "update_renderThread__:: START", __LINE__);
+    /**
+     * @brief check if data is ready
+     * Has to be called by GL.IssuePluginEvent
+     * @param event_id containing the the task index, given by makeRequest_mainThread
+     */
+    void UNITY_INTERFACE_API update_renderThread(int event_id) {
+        UnityLog( "update_renderThread__:: START", __LINE__);
 
-		// Get task back
-		tasks_mutex.lock();
-		std::shared_ptr<Task> task;
+        // Get task back
+        tasks_mutex.lock();
+        std::shared_ptr<Task> task;
         bool taskExist = tryGetValue(tasks, event_id, task);
-		tasks_mutex.unlock();
+        tasks_mutex.unlock();
 
-		// Check if task has not been already deleted by main thread
-		if(taskExist && task != nullptr) {
-			std::queue<Task::SubTask> newSubTaskQueue;
-			while(!task->subTaskQueue.empty()){
-				Task::SubTask& subTask = task->subTaskQueue.front();
-				if(subTask.readed){
-					tasks_mutex.lock();
-					std::free(subTask.data);
-					task->subTaskQueue.pop();
-					tasks_mutex.unlock();
-					continue;
-				}
-				
-				newSubTaskQueue.push(subTask);
+        // Check if task has not been already deleted by main thread
+        if(taskExist && task != nullptr) {
+            std::queue<Task::SubTask> newSubTaskQueue;
+            while(!task->subTaskQueue.empty()){
+                Task::SubTask& subTask = task->subTaskQueue.front();
+                if(subTask.readed){
+                    tasks_mutex.lock();
+                    std::free(subTask.data);
+                    task->subTaskQueue.pop();
+                    tasks_mutex.unlock();
+                    continue;
+                }
+                
+                newSubTaskQueue.push(subTask);
 
-            	// Do something only if initialized (thread safety)
-				if (!subTask.initialized || subTask.done) {
-					return;
-				}
+                // Do something only if initialized (thread safety)
+                if (!subTask.initialized || subTask.done) {
+                    return;
+                }
 
-				// Check fence state
-				GLint status = 0;
-				GLsizei length = 0;
-				glGetSynciv(subTask.fence, GL_SYNC_STATUS, sizeof(GLint), &length, &status);
-				if (length <= 0) {
-					subTask.error = true;
-					subTask.done = true;
-					return;
-				}
+                // Check fence state
+                GLint status = 0;
+                GLsizei length = 0;
+                glGetSynciv(subTask.fence, GL_SYNC_STATUS, sizeof(GLint), &length, &status);
+                if (length <= 0) {
+                    subTask.error = true;
+                    subTask.done = true;
+                    return;
+                }
 
-				// When it's done
-				if (status == GL_SIGNALED) {
+                // When it's done
+                if (status == GL_SIGNALED) {
 
-					// Bind back the pbo
-					glBindBuffer(GL_PIXEL_PACK_BUFFER, subTask.pbo);
-					// Map the buffer and copy it to data
-					void* ptr = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, subTask.size, GL_MAP_READ_BIT);
-					std::memcpy(subTask.data, ptr, subTask.size);
+                    // Bind back the pbo
+                    glBindBuffer(GL_PIXEL_PACK_BUFFER, subTask.pbo);
+                    // Map the buffer and copy it to data
+                    void* ptr = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, subTask.size, GL_MAP_READ_BIT);
+                    std::memcpy(subTask.data, ptr, subTask.size);
 
-					// Unmap and unbind
-					glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-					glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+                    // Unmap and unbind
+                    glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+                    glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 
-					// Clear buffers
-					glDeleteFramebuffers(1, &(subTask.fbo));
-					glDeleteBuffers(1, &(subTask.pbo));
-					glDeleteSync(subTask.fence);
+                    // Clear buffers
+                    glDeleteFramebuffers(1, &(subTask.fbo));
+                    glDeleteBuffers(1, &(subTask.pbo));
+                    glDeleteSync(subTask.fence);
 
-					// yeah task is done!
-					subTask.done = true;
-					subTask.readed = false;
-				}
-			}
-			
+                    // yeah task is done!
+                    subTask.done = true;
+                    subTask.readed = false;
+                }
+            }
+            
         }
 
         // Get SSBOtask back
-		tasks_mutex.lock();
-		std::shared_ptr<SSBOTask> ssbo_task;
+        tasks_mutex.lock();
+        std::shared_ptr<SSBOTask> ssbo_task;
         taskExist = tryGetValue(ssbo_tasks, event_id, ssbo_task);
-		tasks_mutex.unlock();
+        tasks_mutex.unlock();
 
         if(taskExist && ssbo_task != nullptr) {
-			while(!ssbo_task->subTaskQueue.empty()){
-				SSBOTask::SubTask& subTask = ssbo_task->subTaskQueue.front();
-				if(subTask.readed){
-					tasks_mutex.lock();
-					std::free(subTask.data);
-					task->subTaskQueue.pop();
-					tasks_mutex.unlock();
-					continue;
-				}
+            while(!ssbo_task->subTaskQueue.empty()){
+                SSBOTask::SubTask& subTask = ssbo_task->subTaskQueue.front();
+                if(subTask.readed){
+                    tasks_mutex.lock();
+                    std::free(subTask.data);
+                    task->subTaskQueue.pop();
+                    tasks_mutex.unlock();
+                    continue;
+                }
 
-				// Do something only if initialized (thread safety)
-				if (!subTask.initialized || subTask.done) {
-					return;
-				}
+                // Do something only if initialized (thread safety)
+                if (!subTask.initialized || subTask.done) {
+                    return;
+                }
 
-				// Check fence state
-				GLint status = 0;
-				GLsizei length = 0;
-				glGetSynciv(subTask.fence, GL_SYNC_STATUS, sizeof(GLint), &length, &status);
-				if (length <= 0) {
-					subTask.error = true;
-					subTask.done = true;
-					return;
-				}
+                // Check fence state
+                GLint status = 0;
+                GLsizei length = 0;
+                glGetSynciv(subTask.fence, GL_SYNC_STATUS, sizeof(GLint), &length, &status);
+                if (length <= 0) {
+                    subTask.error = true;
+                    subTask.done = true;
+                    return;
+                }
 
-				// When it's done
-				if (status == GL_SIGNALED) {
-					// Bind back the ssbo
-					glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_task->ssbo);
+                // When it's done
+                if (status == GL_SIGNALED) {
+                    // Bind back the ssbo
+                    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_task->ssbo);
 
-					// Map the buffer and copy it to data
-					void* ptr = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_task->offset, ssbo_task->size, GL_MAP_READ_BIT);
-					std::memcpy(subTask.data, ptr, ssbo_task->size);
+                    // Map the buffer and copy it to data
+                    void* ptr = glMapBufferRange(GL_SHADER_STORAGE_BUFFER, ssbo_task->offset, ssbo_task->size, GL_MAP_READ_BIT);
+                    std::memcpy(subTask.data, ptr, ssbo_task->size);
 
-					// Unmap and unbind
-					glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-					glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+                    // Unmap and unbind
+                    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+                    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-					// Clear buffers
-					glDeleteSync(subTask.fence);
+                    // Clear buffers
+                    glDeleteSync(subTask.fence);
 
-					// yeah task is done!
-					subTask.done = true;
-					subTask.readed = false;
+                    // yeah task is done!
+                    subTask.done = true;
+                    subTask.readed = false;
             }
-			}
+            }
         }
 
-		UnityLog( "update_renderThread__:: END", 1);
-	}
-	
-	UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API getfunction_update_renderThread() {
-		return update_renderThread;
-	}
+        UnityLog( "update_renderThread__:: END", 1);
+    }
+    
+    UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API getfunction_update_renderThread() {
+        return update_renderThread;
+    }
 
-	/**
-	 * @brief Get data from the main thread
-	 * @param event_id containing the the task index, given by makeRequest_mainThread
-	 */
-	void getTextureData_mainThread(int event_id, void** buffer, size_t* length) {
+    /**
+     * @brief Get data from the main thread
+     * @param event_id containing the the task index, given by makeRequest_mainThread
+     */
+    void getTextureData_mainThread(int event_id, void** buffer, size_t* length) {
 
-		UnityLog( "getTextureData_mainThread::START ", 0 );
+        UnityLog( "getTextureData_mainThread::START ", 0 );
 
-		// Get task back
-		tasks_mutex.lock();
-		std::shared_ptr<Task> task = tasks[event_id];
-		tasks_mutex.unlock();
+        // Get task back
+        tasks_mutex.lock();
+        std::shared_ptr<Task> task = tasks[event_id];
+        tasks_mutex.unlock();
 
-		if(task->subTaskQueue.empty()){
-			return;
-		}
+        if(task->subTaskQueue.empty()){
+            return;
+        }
 
-		Task::SubTask& subTask = task->subTaskQueue.front();
+        Task::SubTask& subTask = task->subTaskQueue.front();
 
-		// Do something only if initialized (thread safety)
-		if (!subTask.done) {
-			return;
-		}
+        // Do something only if initialized (thread safety)
+        if (!subTask.done) {
+            return;
+        }
 
-		// Copy the pointer. Warning: free will have to be done on script side
-		*length = subTask.size;
-		*buffer = subTask.data;
-		subTask.readed = true;
+        // Copy the pointer. Warning: free will have to be done on script side
+        *length = subTask.size;
+        *buffer = subTask.data;
+        subTask.readed = true;
 
-		UnityLog( "getTextureData_mainThread:: END ",1 );
-	}
+        UnityLog( "getTextureData_mainThread:: END ",1 );
+    }
 
     /**
      * @brief Get data from the main thread
@@ -576,11 +576,11 @@ extern "C"
         std::shared_ptr<SSBOTask> task = ssbo_tasks[event_id];
         tasks_mutex.unlock();
 
-		if(task->subTaskQueue.empty()){
-			return;
-		}
+        if(task->subTaskQueue.empty()){
+            return;
+        }
 
-		SSBOTask::SubTask& subTask = task->subTaskQueue.front();
+        SSBOTask::SubTask& subTask = task->subTaskQueue.front();
 
         // Do something only if initialized (thread safety)
         if (!subTask.done) {
@@ -590,193 +590,193 @@ extern "C"
         // Copy the pointer. Warning: free will have to be done on script side
         *length = task->size;
         *buffer = subTask.data;
-		subTask.readed = true;
+        subTask.readed = true;
 
         UnityLog( "getSSBOData_mainThread:: END ",1 );
     }
     
 
-	/**
-	 * @brief Check if request is done
-	 * @param event_id containing the the task index, given by makeRequest_mainThread
-	 */
-	bool isRequestDone(int event_id) {
+    /**
+     * @brief Check if request is done
+     * @param event_id containing the the task index, given by makeRequest_mainThread
+     */
+    bool isRequestDone(int event_id) {
 
-		UnityLog( "isRequestDone::START ", 0 );
+        UnityLog( "isRequestDone::START ", 0 );
         bool done = false;
 
-		// Get task back
-		{
-			std::unique_lock<std::mutex> lock(tasks_mutex);
-			std::shared_ptr<Task> task;
-			if(tryGetValue(tasks, event_id, task)){
-				if(task->subTaskQueue.empty()){
-					return false;
-				}
-				const Task::SubTask& subTask = task->subTaskQueue.front();
-				done = subTask.done;
-			}
-		}
+        // Get task back
+        {
+            std::unique_lock<std::mutex> lock(tasks_mutex);
+            std::shared_ptr<Task> task;
+            if(tryGetValue(tasks, event_id, task)){
+                if(task->subTaskQueue.empty()){
+                    return false;
+                }
+                const Task::SubTask& subTask = task->subTaskQueue.front();
+                done = subTask.done;
+            }
+        }
 
         // Get SSBOtask back
-		{
-			std::unique_lock<std::mutex> lock(tasks_mutex);
-			std::shared_ptr<SSBOTask> ssbo_task;
-			if(tryGetValue(ssbo_tasks, event_id, ssbo_task)){
-				if(ssbo_task->subTaskQueue.empty()){
-					return false;
-				}
-				const SSBOTask::SubTask& subTask = ssbo_task->subTaskQueue.front();
-				done = subTask.done;
-			}
-		}
+        {
+            std::unique_lock<std::mutex> lock(tasks_mutex);
+            std::shared_ptr<SSBOTask> ssbo_task;
+            if(tryGetValue(ssbo_tasks, event_id, ssbo_task)){
+                if(ssbo_task->subTaskQueue.empty()){
+                    return false;
+                }
+                const SSBOTask::SubTask& subTask = ssbo_task->subTaskQueue.front();
+                done = subTask.done;
+            }
+        }
 
-		UnityLog( "isRequestDone::END ", 1 );
+        UnityLog( "isRequestDone::END ", 1 );
         return done;
-	}
+    }
 
-	/**
-	 * @brief Check if request is in error
-	 * @param event_id containing the the task index, given by makeRequest_mainThread
-	 */
-	bool isRequestError(int event_id) {
-		UnityLog( "isRequestError::START ", 0 );
+    /**
+     * @brief Check if request is in error
+     * @param event_id containing the the task index, given by makeRequest_mainThread
+     */
+    bool isRequestError(int event_id) {
+        UnityLog( "isRequestError::START ", 0 );
         bool error = false;
-		// Get task back
-		{
-			std::unique_lock<std::mutex> lock(tasks_mutex);
-			std::shared_ptr<Task> task;
-			if(tryGetValue(tasks, event_id, task)){
-				if(task->subTaskQueue.empty()){
-					return false;
-				}
-				const Task::SubTask& subTask = task->subTaskQueue.front();
-				error = subTask.error;
-			}
-		}
+        // Get task back
+        {
+            std::unique_lock<std::mutex> lock(tasks_mutex);
+            std::shared_ptr<Task> task;
+            if(tryGetValue(tasks, event_id, task)){
+                if(task->subTaskQueue.empty()){
+                    return false;
+                }
+                const Task::SubTask& subTask = task->subTaskQueue.front();
+                error = subTask.error;
+            }
+        }
 
         // Get SSBOtask back
-		{
-			std::unique_lock<std::mutex> lock(tasks_mutex);
-			std::shared_ptr<SSBOTask> ssbo_task;
-			if(tryGetValue(ssbo_tasks, event_id, ssbo_task)){
-				if(ssbo_task->subTaskQueue.empty()){
-					return false;
-				}
-				const SSBOTask::SubTask& subTask = ssbo_task->subTaskQueue.front();
-				error = subTask.error;
-			}
-		}
+        {
+            std::unique_lock<std::mutex> lock(tasks_mutex);
+            std::shared_ptr<SSBOTask> ssbo_task;
+            if(tryGetValue(ssbo_tasks, event_id, ssbo_task)){
+                if(ssbo_task->subTaskQueue.empty()){
+                    return false;
+                }
+                const SSBOTask::SubTask& subTask = ssbo_task->subTaskQueue.front();
+                error = subTask.error;
+            }
+        }
 
-		UnityLog( "isRequestError::END ", 0 );
+        UnityLog( "isRequestError::END ", 0 );
 
-		return error;
-	}
+        return error;
+    }
 
-	bool isRequestReaded(int event_id) {
-		UnityLog( "isRequestReaded::START ", 0 );
-		bool readed = false;
-		// Get task back
-		{
-			std::unique_lock<std::mutex> lock(tasks_mutex);
-			std::shared_ptr<Task> task;
-			if(tryGetValue(tasks, event_id, task)){
-				if(task->subTaskQueue.empty()){
-					return false;
-				}
-				const Task::SubTask& subTask = task->subTaskQueue.front();
-				readed = subTask.readed;
-			}
-		}
+    bool isRequestReaded(int event_id) {
+        UnityLog( "isRequestReaded::START ", 0 );
+        bool readed = false;
+        // Get task back
+        {
+            std::unique_lock<std::mutex> lock(tasks_mutex);
+            std::shared_ptr<Task> task;
+            if(tryGetValue(tasks, event_id, task)){
+                if(task->subTaskQueue.empty()){
+                    return false;
+                }
+                const Task::SubTask& subTask = task->subTaskQueue.front();
+                readed = subTask.readed;
+            }
+        }
 
-		// Get SSBOtask back
-		{
-			std::unique_lock<std::mutex> lock(tasks_mutex);
-			std::shared_ptr<SSBOTask> ssbo_task; 
-			if(tryGetValue(ssbo_tasks, event_id, ssbo_task)){
-				if(ssbo_task->subTaskQueue.empty()){
-					return false;
-				}
-				const SSBOTask::SubTask& subTask = ssbo_task->subTaskQueue.front();
-				readed = subTask.readed;
-			}
-		}
+        // Get SSBOtask back
+        {
+            std::unique_lock<std::mutex> lock(tasks_mutex);
+            std::shared_ptr<SSBOTask> ssbo_task; 
+            if(tryGetValue(ssbo_tasks, event_id, ssbo_task)){
+                if(ssbo_task->subTaskQueue.empty()){
+                    return false;
+                }
+                const SSBOTask::SubTask& subTask = ssbo_task->subTaskQueue.front();
+                readed = subTask.readed;
+            }
+        }
 
-		UnityLog( "isRequestReaded::END ", 0 );
-		return readed;
-	}
+        UnityLog( "isRequestReaded::END ", 0 );
+        return readed;
+    }
 
-	bool popRequest(int event_id) {
-		UnityLog( "popRequest::START ", 0 );
-		bool done = false;
-		// Get task back
-		{
-			std::unique_lock<std::mutex> lock(tasks_mutex);
-			std::shared_ptr<Task> task;
-			if(tryGetValue(tasks, event_id, task)){
-				if(task->subTaskQueue.empty()){
-					return false;
-				}
-				std::free(task->subTaskQueue.front().data);
-				task->subTaskQueue.pop();
-				done = true;
-			}
-		}
+    bool popRequest(int event_id) {
+        UnityLog( "popRequest::START ", 0 );
+        bool done = false;
+        // Get task back
+        {
+            std::unique_lock<std::mutex> lock(tasks_mutex);
+            std::shared_ptr<Task> task;
+            if(tryGetValue(tasks, event_id, task)){
+                if(task->subTaskQueue.empty()){
+                    return false;
+                }
+                std::free(task->subTaskQueue.front().data);
+                task->subTaskQueue.pop();
+                done = true;
+            }
+        }
 
-		// Get SSBOtask back
-		{
-			std::unique_lock<std::mutex> lock(tasks_mutex);
-			std::shared_ptr<SSBOTask> ssbo_task;
-			if(tryGetValue(ssbo_tasks, event_id, ssbo_task)){
-				if(ssbo_task->subTaskQueue.empty()){
-					return false;
-				}
-				std::free(ssbo_task->subTaskQueue.front().data);
-				ssbo_task->subTaskQueue.pop();
-				done = true;
-			}
-		}
+        // Get SSBOtask back
+        {
+            std::unique_lock<std::mutex> lock(tasks_mutex);
+            std::shared_ptr<SSBOTask> ssbo_task;
+            if(tryGetValue(ssbo_tasks, event_id, ssbo_task)){
+                if(ssbo_task->subTaskQueue.empty()){
+                    return false;
+                }
+                std::free(ssbo_task->subTaskQueue.front().data);
+                ssbo_task->subTaskQueue.pop();
+                done = true;
+            }
+        }
 
-		UnityLog( "popRequest::END ", 0 );
-		return done;
-	}
+        UnityLog( "popRequest::END ", 0 );
+        return done;
+    }
 
-	/**
-	 * @brief clear data for a frame
-	 * Warning : Buffer is never cleaned, it has to be cleaned from script side 
-	 * Has to be called by GL.IssuePluginEvent
-	 * @param event_id containing the the task index, given by makeRequest_mainThread
-	 */
-	void dispose(int event_id) {
-		UnityLog( "dispose::START", event_id );
+    /**
+     * @brief clear data for a frame
+     * Warning : Buffer is never cleaned, it has to be cleaned from script side 
+     * Has to be called by GL.IssuePluginEvent
+     * @param event_id containing the the task index, given by makeRequest_mainThread
+     */
+    void dispose(int event_id) {
+        UnityLog( "dispose::START", event_id );
 
-		// Remove from tasks
-		tasks_mutex.lock();
-		std::shared_ptr<Task> task;
+        // Remove from tasks
+        tasks_mutex.lock();
+        std::shared_ptr<Task> task;
         if(tryGetValue(tasks, event_id, task)){
-			while(!task->subTaskQueue.empty()){
-				const Task::SubTask& subTask = task->subTaskQueue.front();
-            	std::free(subTask.data);
-				task->subTaskQueue.pop();
-			}
+            while(!task->subTaskQueue.empty()){
+                const Task::SubTask& subTask = task->subTaskQueue.front();
+                std::free(subTask.data);
+                task->subTaskQueue.pop();
+            }
             tasks.erase(event_id);
         }
-		tasks_mutex.unlock();
+        tasks_mutex.unlock();
 
         // Remove from ssbo_tasks
         tasks_mutex.lock();
         std::shared_ptr<SSBOTask> ssbo_task;
         if(tryGetValue(ssbo_tasks, event_id, ssbo_task)){
-			while(!ssbo_task->subTaskQueue.empty()){
-				const SSBOTask::SubTask& subTask = ssbo_task->subTaskQueue.front();
-				std::free(subTask.data);
-				ssbo_task->subTaskQueue.pop();
-			}
-			ssbo_tasks.erase(event_id);
-		}
+            while(!ssbo_task->subTaskQueue.empty()){
+                const SSBOTask::SubTask& subTask = ssbo_task->subTaskQueue.front();
+                std::free(subTask.data);
+                ssbo_task->subTaskQueue.pop();
+            }
+            ssbo_tasks.erase(event_id);
+        }
         tasks_mutex.unlock();
-		UnityLog( "dispose::END" , 1);
-	}
+        UnityLog( "dispose::END" , 1);
+    }
 }
 
 

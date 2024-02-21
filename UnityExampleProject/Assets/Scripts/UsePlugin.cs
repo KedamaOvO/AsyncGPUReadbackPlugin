@@ -36,7 +36,7 @@ public class UsePlugin : MonoBehaviour
 
 	void Start()
 	{
-		Invoke("_Init", 1f);
+		Invoke("_Init", 3f);
 	}
 
 	private void OnDestroy()
@@ -61,17 +61,17 @@ public class UsePlugin : MonoBehaviour
 				SaveBitmap(req.GetData<byte>(), Screen.width, Screen.height);
 			}
 		});
-		commandBuffer.SetGlobalBuffer(Shader.PropertyToID("_Result"), _computeBuffer);
-		commandBuffer.DispatchCompute(_computeShader, 0, 1, 1, 1);
-		commandBuffer.RequestAsyncReadbackPlugin(_computeBuffer, req =>
-		{
-			if (req.done)
-			{
-				float time =  req.GetData<float>()[0];
-				timeFromCs = time;
-			}
-		});
-		_camera.AddCommandBuffer(CameraEvent.AfterEverything,commandBuffer);
+        commandBuffer.SetGlobalBuffer(Shader.PropertyToID("_Result"), _computeBuffer);
+        commandBuffer.DispatchCompute(_computeShader, 0, 1, 1, 1);
+        commandBuffer.RequestAsyncReadbackPlugin(_computeBuffer, req =>
+        {
+            if (req.done)
+            {
+                float time = req.GetData<float>()[0];
+                timeFromCs = time;
+            }
+        });
+        _camera.AddCommandBuffer(CameraEvent.AfterEverything,commandBuffer);
 	}
 
 	void Update()

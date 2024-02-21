@@ -250,6 +250,7 @@ namespace AsyncGPUReadbackPluginNs
 			}
 			
 			var flag = isSSBOCompatible() && SystemInfo.supportsComputeShaders;
+			Debug.LogFormat($"isSSBOCompatible:{flag}");
 			if (flag)
 			{
 				// Set C++ console
@@ -316,6 +317,7 @@ namespace AsyncGPUReadbackPluginNs
 			if (usePlugin)
 			{
 				GL.IssuePluginEvent(getfunction_update_renderThread(), this.eventId);
+
 				bool readed = false;
 				while (!readed)
 				{
